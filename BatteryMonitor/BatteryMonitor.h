@@ -6,7 +6,12 @@ using namespace std::chrono_literals;
 
 #define CURRENTRATING 10.5
 
-class BatteryMonitor : public rclcpp : Node {
+/// @TODO: 
+// Pack voltage
+// Current sensor reading 
+//  Estimated remaining pack capacity based on total capacity and integrated current reading
+
+    class BatteryMonitor : public rclcpp : Node {
 public:
   BatteryMonitor() : Node("BatteryMonitorPublish") {
     timeInital = startupTime;

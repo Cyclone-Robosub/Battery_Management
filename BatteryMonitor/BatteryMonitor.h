@@ -5,24 +5,31 @@
 using namespace std::chrono_literals;
 
 #define CURRENTRATING 10.5
+#define MAXVOLT
+#define MINVOLT
 
-/// @TODO: 
+/// @TODO:
 // Pack voltage
-// Current sensor reading 
-//  Estimated remaining pack capacity based on total capacity and integrated current reading
+// Current sensor reading
+//  Estimated remaining pack capacity based on total capacity and integrated
+//  current reading
 
-    class BatteryMonitor : public rclcpp : Node {
+class BatteryMonitor : public rclcpp : Node {
 public:
   BatteryMonitor() : Node("BatteryMonitorPublish") {
-    timeInital = startupTime;
-	//Need a startup SOC. 
     // SetupADCConnection();
+    timeInital = startupTime;
+    // Need a startup SOC.
+    previousSOC = (ReadVolt() - MINVOLT / (MAXVOLT - MINVOLT)) / 100;
+    // Callback CurrentCharge.
     SOCPublisher =
         this->create_publisher<std_msgs::msg::Double>("SOCTopic", 10);
+
     auto SOC_RealTime_callback = [this]() -> void {
-      this->SOCPublisher->publish(ReadSOC());
+      this->SOCPublisher->publish(CalcSOC());
     };
-    timer_ = this->create_wall_timer(100ms, SOC_RealTime_callback());
+
+    SOCtimer_ = this->create_wall_timer(100ms, SOC_RealTime_callback());
   }
   // Setup publisher to a SOC Topic.
 private:
@@ -33,12 +40,14 @@ private:
   std::chrono::steady_clock::time_point startupTime =
       std::chrono::steady_clock::now();
   rclcpp::Publisher<std_msgs::msg::Double>::SharedPtr SOCPublisher;
-  rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::Subscriber<std_msgs::msg::String>::SharedPtr CurrentChargeSub;
+  rclcpp::TimerBase::SharedPtr SOCtimer_;
   std::chrono::steady_clock::time_point timeInital;
   double currentCurrentValue;
   std::chrono::steady_clock::time_point timeFinal;
   const double currentRating = CURRENTRATING;
-  //Need a startup SOC.
+  // Need a startup SOC.
   double previousSOC;
-  double ReadSOC();
+  double CalcSOC();
+  double ReadVolt();
 };

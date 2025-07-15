@@ -1,5 +1,6 @@
 #include "BatteryMonitor.h"
 #include <chrono>
+#define DANGERSOC 5
 
 /// @brief Step Function. 
 double BatteryMonitor::CalcSOC() {
@@ -16,6 +17,9 @@ double BatteryMonitor::CalcSOC() {
   previousSOC = resultingSOC;
   timeInital = timeFinal;
 
+  if(resultingSOC <= DANGERSOC){
+	SOCIntPublisher->publish(true);
+  }
   return resultingSOC;
 }
 /// @brief Callback ROS2 topic function

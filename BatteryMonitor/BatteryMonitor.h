@@ -5,8 +5,8 @@
 using namespace std::chrono_literals;
 
 #define CURRENTRATING 10.5
-#define MAXVOLT
-#define MINVOLT
+#define MAXVOLT 16.8
+#define MINVOLT 14
 
 /// @TODO:
 // Pack voltage
@@ -19,11 +19,13 @@ public:
   BatteryMonitor() : Node("BatteryMonitorPublish") {
     // SetupADCConnection();
     timeInital = startupTime;
-    // Need a startup SOC.
+   //StartupSOC
     previousSOC = (ReadVolt() - MINVOLT / (MAXVOLT - MINVOLT)) / 100;
     // Callback CurrentCharge.
     SOCPublisher =
         this->create_publisher<std_msgs::msg::Double>("SOCTopic", 10);
+	SOCIntPublisher =
+		this->create_publisher<std_msgs::msg::Bool>("SOCIntTopic", 10);
 
     auto SOC_RealTime_callback = [this]() -> void {
       this->SOCPublisher->publish(CalcSOC());
@@ -41,6 +43,7 @@ private:
       std::chrono::steady_clock::now();
   rclcpp::Publisher<std_msgs::msg::Double>::SharedPtr SOCPublisher;
   rclcpp::Subscriber<std_msgs::msg::String>::SharedPtr CurrentChargeSub;
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr SOCIntPublisher;
   rclcpp::TimerBase::SharedPtr SOCtimer_;
   std::chrono::steady_clock::time_point timeInital;
   double currentCurrentValue;

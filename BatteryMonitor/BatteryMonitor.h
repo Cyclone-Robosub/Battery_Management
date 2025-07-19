@@ -1,7 +1,9 @@
 #include "BatteryMonitor.cpp"
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/string.hpp"
 #include <chrono>
+#include <iostream>
 using namespace std::chrono_literals;
 
 #define CURRENTRATING 10.5
@@ -19,18 +21,23 @@ public:
   BatteryMonitor() : Node("BatteryMonitorPublish") {
     // SetupADCConnection();
     timeInital = startupTime;
-   //StartupSOC
+    std::cout << startupTime << std::endl;
+
+    // StartupSOC using Voltage at a single time point
     previousSOC = (ReadVolt() - MINVOLT / (MAXVOLT - MINVOLT)) / 100;
+
     // Callback CurrentCharge.
     SOCPublisher =
         this->create_publisher<std_msgs::msg::Double>("SOCTopic", 10);
-	SOCIntPublisher =
-		this->create_publisher<std_msgs::msg::Bool>("SOCIntTopic", 10);
+    SOCINTPublisher =
+        this->create_publisher<std_msgs::msg::Bool>("SOCIntTopic", 10);
 
+    // This function also generates INT for the SOCPublisherINT. If the call to
+    // this function is removed, then make sure to replace with some way of
+    // checking for INT of SOC.
     auto SOC_RealTime_callback = [this]() -> void {
       this->SOCPublisher->publish(CalcSOC());
     };
-
     SOCtimer_ = this->create_wall_timer(100ms, SOC_RealTime_callback());
   }
   // Setup publisher to a SOC Topic.

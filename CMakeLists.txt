@@ -9,7 +9,8 @@ set(EXPORT_COMPILE_COMMANDS ON)
 
 
 add_executable( BatteryMontExecutable
-    BatteryMonitor/BatteryMonitor.h
+  BatteryMonitor/main.cpp
+    BatteryMonitor/BatteryMonitor.hpp
 	BatteryMonitor/BatteryMonitor.cpp
 )
 ament_target_dependencies(BatteryMontExecutable rclcpp std_msgs)

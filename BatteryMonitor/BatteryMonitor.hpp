@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 
 class BatteryMonitor : public rclcpp : Node {
 public:
-  BatteryMonitor() : Node("BatteryMonitorPublish") {
+  BatteryMonitor() : Node("BatteryMonitorPublish"), startupTime(std::chrono::steady_clock::now()) {
     // SetupADCConnection();
     timeInital = startupTime;
     std::cout << startupTime << std::endl;
@@ -46,8 +46,7 @@ private:
 
   // test cases: StartupTime should be at power for Robot. Maybe try to look
   // through logs of when Pi started up?
-  std::chrono::steady_clock::time_point startupTime =
-      std::chrono::steady_clock::now();
+  std::chrono::steady_clock::time_point startupTime;
   rclcpp::Publisher<std_msgs::msg::Double>::SharedPtr SOCPublisher;
   rclcpp::Subscriber<std_msgs::msg::String>::SharedPtr CurrentChargeSub;
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr SOCIntPublisher;

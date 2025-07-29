@@ -3,15 +3,15 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float64.hpp>
-
-// Made by AI from existing code.
+//Initial design by AI
 
 class BatteryMonitorTest : public ::testing::Test {
 protected:
   void SetUp() override {
     rclcpp::init(0, nullptr);
     node = std::make_shared<BatteryMonitor>();
-
+    std::thread StartupThread(&BatteryMonitor::Startup, &(*node));
+    StartupThread.detach();
     // Setup test publishers
     volt_pub = node->create_publisher<std_msgs::msg::Float64>("Volt_Topic", 10);
     current_pub =
@@ -61,31 +61,35 @@ protected:
 
 TEST_F(BatteryMonitorTest, PublishesSOC) {
   std_msgs::msg::Float64 volt_msg;
-  volt_msg.data = 15.5; // Simulate voltage reading
+  volt_msg.data = 16.7; // Simulate voltage reading
   volt_pub->publish(volt_msg);
 
   std_msgs::msg::Float64 current_msg;
-  current_msg.data = -1.0; // Simulate current draw
+  current_msg.data = -15.0; // Simulate current draw
   current_pub->publish(current_msg);
 
   rclcpp::sleep_for(std::chrono::milliseconds(200));
+  for (int i = 0; i < 10; ++i) {
+    current_pub->publish(current_msg);
+    current_msg.data -= 20;
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
+  }
 
   // Allow time for callback and timer to trigger
   for (int i = 0; i < 10 && !soc_received; ++i) {
     rclcpp::sleep_for(std::chrono::milliseconds(100));
   }
-
   EXPECT_TRUE(soc_received);
   EXPECT_GT(last_soc, -1.0); // It should have calculated some SOC value
 }
 
 TEST_F(BatteryMonitorTest, TriggersSOCInterrupt) {
   std_msgs::msg::Float64 volt_msg;
-  volt_msg.data = 14.1;
+  volt_msg.data = 14.005;
   volt_pub->publish(volt_msg);
 
   std_msgs::msg::Float64 current_msg;
-  current_msg.data = -100.0; // Simulate huge discharge
+  current_msg.data = -10000.0; // Simulate huge discharge
   current_pub->publish(current_msg);
 
   // Let SOC drop fast enough to hit DANGERSOCLEVEL
@@ -104,8 +108,8 @@ TEST_F(BatteryMonitorTest, ContinuousSOCPublishing) {
   std_msgs::msg::Float64 volt_msg;
   std_msgs::msg::Float64 current_msg;
 
-  volt_msg.data = 15.0;    // Mid-level voltage
-  current_msg.data = -2.0; // Mild current draw
+  volt_msg.data = 15.0;     // Mid-level voltage
+  current_msg.data = -14.0; // Mild current draw
 
   int messages_received = 0;
 
@@ -118,9 +122,9 @@ TEST_F(BatteryMonitorTest, ContinuousSOCPublishing) {
       });
 
   for (int i = 0; i < 10; ++i) {
-    volt_pub->publish(volt_msg);
     current_pub->publish(current_msg);
-    rclcpp::sleep_for(std::chrono::milliseconds(200));
+    current_msg.data -= 20;
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
   }
 
   EXPECT_GE(messages_received, 5)

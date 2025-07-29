@@ -9,7 +9,7 @@
 #include <iostream>
 using namespace std::chrono_literals;
 
-#define CURRENTRATING 10.5
+#define CURRENTRATING 36000
 #define MAXVOLT 16.8
 #define MINVOLT 14
 
@@ -21,40 +21,19 @@ using namespace std::chrono_literals;
 
 class BatteryMonitor : public rclcpp::Node {
 public:
-  BatteryMonitor()
-      : Node("BatteryMonitorNode"),
-        startupTime(std::chrono::steady_clock::now()) {
-    // SetupADCConnection();
-    CurrentChargeSub = this->create_subscription<std_msgs::msg::Float64>(
-        "Current_Topic", 10,
-        std::bind(&BatteryMonitor::getCurrent, this, std::placeholders::_1));
-    CurrentVoltSub = this->create_subscription<std_msgs::msg::Float64>(
-        "Volt_Topic", 10,
-        std::bind(&BatteryMonitor::getVolt, this, std::placeholders::_1));
-    timeInital = startupTime;
-    // StartupSOC using Voltage at a single time point
-    previousSOC = (CurrentVolt - MINVOLT / (MAXVOLT - MINVOLT)) / 100;
-
-    // Callback CurrentCharge.
-    SOCPublisher =
-        this->create_publisher<std_msgs::msg::Float64>("SOCTopic", 10);
-    SOCINTPublisher =
-        this->create_publisher<std_msgs::msg::Bool>("SOCIntTopic", 10);
-
-    // This function also generates INT for the SOCPublisherINT. If the call to
-    // this function is removed, then make sure to replace with some way of
-    // checking for INT of SOC.
-    SOCtimer_ =
-        this->create_wall_timer(std::chrono::milliseconds(100),
-                                [this]() { this->SOC_RealTime_callback(); });
+  BatteryMonitor() : Node("BatteryMonitorNode") {
+    SetupADCConnection();
+    StartupROS();
   }
   // Setup publisher to a SOC Topic.
+  void Startup();
+
 private:
   // Implement c++ guidelines
-
+  void SetupADCConnection();
+  void StartupROS();
   // test cases: StartupTime should be at power for Robot. Maybe try to look
   // through logs of when Pi started up?
-  std::chrono::steady_clock::time_point startupTime;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr SOCPublisher;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr CurrentChargeSub;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr CurrentVoltSub;
@@ -69,9 +48,10 @@ private:
   double CalcSOC();
 
   void getVolt(const std_msgs::msg::Float64::SharedPtr msg);
-  double CurrentVolt;
+  std::optional<double> CurrentVolt;
   void getCurrent(const std_msgs::msg::Float64::SharedPtr msg);
-  double CurrentCurrent;
+  std::optional<double> CurrentCurrent;
   void SOC_RealTime_callback();
+  std::atomic<bool> voltReceived{false};
 };
 #endif

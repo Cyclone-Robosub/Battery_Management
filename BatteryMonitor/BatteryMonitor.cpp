@@ -8,10 +8,10 @@
 void BatteryMonitor::SetupADCConnection() {}
 void BatteryMonitor::StartupROS() {
   CurrentChargeSub = this->create_subscription<std_msgs::msg::Float64>(
-      "Current_Topic", 10,
+      "currentReadingTopic", 10,
       std::bind(&BatteryMonitor::getCurrent, this, std::placeholders::_1));
   CurrentVoltSub = this->create_subscription<std_msgs::msg::Float64>(
-      "Volt_Topic", 10,
+      "voltageReadingTopic", 10,
       std::bind(&BatteryMonitor::getVolt, this, std::placeholders::_1));
   // Callback CurrentCharge.
   SOCPublisher = this->create_publisher<std_msgs::msg::Float64>("SOCTopic", 10);
@@ -22,7 +22,7 @@ void BatteryMonitor::StartupROS() {
 void BatteryMonitor::Startup() {
   timeInital = std::chrono::steady_clock::now();
   while (!voltReceived) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
   std::cout << "something : " << CurrentVolt.value() << std::endl;
   ;
@@ -46,7 +46,7 @@ double BatteryMonitor::CalcSOC() {
   auto deltaTime =
       std::chrono::duration<double>(timeFinal - timeInital).count();
   resultingSOC =
-      previousSOC + (CurrentCurrent.value() / currentRating) * (deltaTime);
+      previousSOC - (CurrentCurrent.value() / currentRating) * (deltaTime);
 
   // Setup for next Reading of SOC
   previousSOC = resultingSOC;
@@ -64,8 +64,7 @@ void BatteryMonitor::getVolt(const std_msgs::msg::Float64::SharedPtr msg) {
   CurrentVolt = static_cast<double>(msg->data);
   voltReceived = true;
 }
-/// @brief Callback ROS2 topic function. Get Current should be negative when the
-/// robot is in the pool.
+/// @brief Callback ROS2 topic function.
 void BatteryMonitor::getCurrent(const std_msgs::msg::Float64::SharedPtr msg) {
   CurrentCurrent = static_cast<double>(msg->data);
 }

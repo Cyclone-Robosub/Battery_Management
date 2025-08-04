@@ -22,7 +22,8 @@ void BatteryMonitor::StartupROS() {
 void BatteryMonitor::Startup() {
   timeInital = std::chrono::steady_clock::now();
   while (!voltReceived) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(959));
+    std::cout << "Waiting" << std::endl;
   }
   std::cout << "something : " << CurrentVolt.value() << std::endl;
   ;

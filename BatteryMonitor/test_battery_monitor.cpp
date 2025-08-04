@@ -60,10 +60,8 @@ protected:
 };
 
 TEST_F(BatteryMonitorTest, PublishesSOC) {
-  std::this_thread::sleep_for(std::chrono::seconds(3));
   std_msgs::msg::Float64 volt_msg;
   volt_msg.data = 16.7; // Simulate voltage reading
-  std::cout << "Publish Data" << std::endl;
   volt_pub->publish(volt_msg);
 
   std_msgs::msg::Float64 current_msg;

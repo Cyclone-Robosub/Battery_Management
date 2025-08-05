@@ -5,17 +5,48 @@ Running main() from /opt/ros/jazzy/src/gtest_vendor/src/gtest_main.cc
 [ RUN      ] BatteryMonitorTest.PublishesSOC
 something : 16.7
 starting SOC 96.4286
-[       OK ] BatteryMonitorTest.PublishesSOC (1249 ms)
+[       OK ] BatteryMonitorTest.PublishesSOC (1330 ms)
 [ RUN      ] BatteryMonitorTest.TriggersSOCInterrupt
 something : 14.005
 starting SOC 0.178571
-[       OK ] BatteryMonitorTest.TriggersSOCInterrupt (1033 ms)
+[       OK ] BatteryMonitorTest.TriggersSOCInterrupt (1108 ms)
 [ RUN      ] BatteryMonitorTest.ContinuousSOCPublishing
 something : 15
 starting SOC 35.7143
-[       OK ] BatteryMonitorTest.ContinuousSOCPublishing (2066 ms)
-[----------] 3 tests from BatteryMonitorTest (4349 ms total)
+[       OK ] BatteryMonitorTest.ContinuousSOCPublishing (805 ms)
+[----------] 3 tests from BatteryMonitorTest (3245 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (4349 ms total)
+[==========] 3 tests from 1 test suite ran. (3245 ms total)
 [  PASSED  ] 3 tests.
+
+SOC output
+96.4285
+96.4285
+96.4285
+96.4284
+96.4282
+96.428
+96.4277
+96.4274
+96.427
+96.4266
+96.4261
+96.4255
+0.15619
+0.127646
+0.0998103
+0.0719658
+0.0441188
+0.0162691
+-0.0115683
+-0.0394244
+-0.0672908
+-0.0950967
+35.7142
+35.7141
+35.7139
+35.7135
+35.7132
+35.7127
+35.7121

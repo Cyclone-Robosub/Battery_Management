@@ -23,17 +23,17 @@ add_executable(BatteryMontExecutable
 )
 ament_target_dependencies(BatteryMontExecutable rclcpp std_msgs)
 
-if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(battery_management_test
     BatteryMonitor/test_battery_monitor.cpp
      BatteryMonitor/BatteryMonitor.cpp
+     BatteryMonitor/BatteryMonitor.hpp
   )
   ament_target_dependencies(battery_management_test
     rclcpp
     std_msgs
   )
-endif()
+
 
 
 install(TARGETS

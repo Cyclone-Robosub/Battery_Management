@@ -1,0 +1,21 @@
+Running main() from /opt/ros/jazzy/src/gtest_vendor/src/gtest_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from BatteryMonitorTest
+[ RUN      ] BatteryMonitorTest.PublishesSOC
+something : 16.7
+starting SOC 96.4286
+[       OK ] BatteryMonitorTest.PublishesSOC (1249 ms)
+[ RUN      ] BatteryMonitorTest.TriggersSOCInterrupt
+something : 14.005
+starting SOC 0.178571
+[       OK ] BatteryMonitorTest.TriggersSOCInterrupt (1033 ms)
+[ RUN      ] BatteryMonitorTest.ContinuousSOCPublishing
+something : 15
+starting SOC 35.7143
+[       OK ] BatteryMonitorTest.ContinuousSOCPublishing (2066 ms)
+[----------] 3 tests from BatteryMonitorTest (4349 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (4349 ms total)
+[  PASSED  ] 3 tests.

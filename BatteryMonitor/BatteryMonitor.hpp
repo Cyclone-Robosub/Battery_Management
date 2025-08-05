@@ -24,9 +24,12 @@ public:
   BatteryMonitor() : Node("BatteryMonitorNode") {
     SetupADCConnection();
     StartupROS();
+   // std::thread StartupThread(&BatteryMonitor::Startup, this);
+   // StartupThread.detach();
   }
   // Setup publisher to a SOC Topic.
   void Startup();
+  void Shutdown();
 
 private:
   // Implement c++ guidelines
@@ -34,6 +37,7 @@ private:
   void StartupROS();
   // test cases: StartupTime should be at power for Robot. Maybe try to look
   // through logs of when Pi started up?
+  rclcpp::CallbackGroup::SharedPtr callbackBattery;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr SOCPublisher;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr CurrentChargeSub;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr CurrentVoltSub;
@@ -53,5 +57,6 @@ private:
   std::optional<double> CurrentCurrent;
   void SOC_RealTime_callback();
   std::atomic<bool> voltReceived{false};
+  std::atomic<bool> KeepGoing{true};
 };
 #endif
